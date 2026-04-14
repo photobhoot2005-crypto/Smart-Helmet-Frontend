@@ -1,0 +1,6 @@
+{
+  "name": "SafeRide: Smart Helmet Companion",
+  "description": "A comprehensive safety and telemetry dashboard for smart helmets, featuring real-time SOS triage, crash reports, and trip tracking.",
+  "requestFramePermissions": ["geolocation"],
+  "majorCapabilities": []
+}

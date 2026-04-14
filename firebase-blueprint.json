@@ -1,0 +1,114 @@
+{
+  "entities": {
+    "RiderProfile": {
+      "title": "Rider Profile",
+      "description": "Static data about the rider for emergency use.",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "description": "Rider's full name" },
+        "bloodType": { "type": "string", "description": "Rider's blood type" },
+        "allergies": { "type": "string", "description": "Known severe allergies or medical conditions" },
+        "emergencyContacts": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "List of up to 3 emergency phone numbers"
+        }
+      },
+      "required": ["name", "bloodType", "emergencyContacts"]
+    },
+    "HelmetStatus": {
+      "title": "Helmet Status",
+      "description": "Real-time telemetry and system health from the helmet.",
+      "type": "object",
+      "properties": {
+        "battery": { "type": "number", "description": "Battery percentage (0-100)" },
+        "imuStatus": { "type": "boolean", "description": "IMU sensor status" },
+        "gpsStatus": { "type": "boolean", "description": "GPS module status" },
+        "gsmStatus": { "type": "boolean", "description": "GSM module status" },
+        "heartRate": { "type": "number", "description": "Current Heart Rate (BPM)" },
+        "spO2": { "type": "number", "description": "Current SpO2 levels" },
+        "gpsLock": { "type": "boolean", "description": "GPS lock status" },
+        "crashSensitivity": { "type": "string", "enum": ["City Commute", "Off-Road/Potholes"], "description": "Crash detection sensitivity" },
+        "isCrashing": { "type": "boolean", "description": "Whether a crash is currently detected" }
+      }
+    },
+    "CrashReport": {
+      "title": "Crash Report",
+      "description": "Data logged when a crash event is triggered.",
+      "type": "object",
+      "properties": {
+        "timestamp": { "type": "string", "format": "date-time", "description": "Time of the crash" },
+        "gForce": { "type": "number", "description": "Peak G-force magnitude" },
+        "latitude": { "type": "number", "description": "GPS Latitude" },
+        "longitude": { "type": "number", "description": "GPS Longitude" }
+      }
+    },
+    "Trip": {
+      "title": "Trip",
+      "description": "A recorded ride with route coordinates.",
+      "type": "object",
+      "properties": {
+        "startTime": { "type": "string", "format": "date-time", "description": "Start time of the ride" },
+        "endTime": { "type": "string", "format": "date-time", "description": "End time of the ride" },
+        "route": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "lat": { "type": "number" },
+              "lng": { "type": "number" },
+              "timestamp": { "type": "string", "format": "date-time" }
+            }
+          }
+        }
+      }
+    },
+    "SensorLog": {
+      "title": "Sensor Log",
+      "description": "Raw sensor data logged in real-time.",
+      "type": "object",
+      "properties": {
+        "timestamp": { "type": "string", "format": "date-time" },
+        "imu": {
+          "type": "object",
+          "properties": {
+            "ax": { "type": "number" },
+            "ay": { "type": "number" },
+            "az": { "type": "number" }
+          }
+        },
+        "gps": {
+          "type": "object",
+          "properties": {
+            "lat": { "type": "number" },
+            "lng": { "type": "number" }
+          }
+        },
+        "heartRate": { "type": "number" },
+        "spO2": { "type": "number" }
+      }
+    }
+  },
+  "firestore": {
+    "/users/{userId}/profile/main": {
+      "schema": "RiderProfile",
+      "description": "The rider's personal and emergency info."
+    },
+    "/users/{userId}/status/live": {
+      "schema": "HelmetStatus",
+      "description": "Live telemetry from the helmet."
+    },
+    "/users/{userId}/crashes/{crashId}": {
+      "schema": "CrashReport",
+      "description": "History of crash events."
+    },
+    "/users/{userId}/trips/{tripId}": {
+      "schema": "Trip",
+      "description": "History of recorded rides."
+    },
+    "/users/{userId}/sensorData/{logId}": {
+      "schema": "SensorLog",
+      "description": "Real-time raw sensor data logs."
+    }
+  }
+}

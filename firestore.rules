@@ -1,0 +1,122 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    //
+    // Collection: /users/{userId}/profile
+    // Document ID: main
+    // Fields:
+    //   - name: string (required)
+    //   - bloodType: string (required)
+    //   - allergies: string (optional)
+    //   - emergencyContacts: list of strings (required, max 3)
+    //
+    // Collection: /users/{userId}/status
+    // Document ID: live
+    // Fields:
+    //   - battery: number
+    //   - imuStatus: bool
+    //   - gpsStatus: bool
+    //   - gsmStatus: bool
+    //   - heartRate: number
+    //   - spO2: number
+    //   - gpsLock: bool
+    //   - crashSensitivity: string (enum)
+    //   - isCrashing: bool
+    //
+    // Collection: /users/{userId}/crashes
+    // Document ID: {crashId}
+    // Fields:
+    //   - timestamp: timestamp
+    //   - gForce: number
+    //   - latitude: number
+    //   - longitude: number
+    //
+    // Collection: /users/{userId}/trips
+    // Document ID: {tripId}
+    // Fields:
+    //   - startTime: timestamp
+    //   - endTime: timestamp
+    //   - route: list of maps {lat, lng, timestamp}
+    //
+    // Collection: /users/{userId}/sensorData
+    // Document ID: {logId}
+    // Fields:
+    //   - timestamp: timestamp
+    //   - imu: map {ax, ay, az}
+    //   - gps: map {lat, lng}
+    //   - heartRate: number
+    //   - spO2: number
+    //
+    // ===============================================================
+
+    // ===============================================================
+    // Helper Functions
+    // ===============================================================
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() &&
+        (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin' ||
+          (request.auth.token.email == "yalawattichinmay@gmail.com" && request.auth.token.email_verified == true));
+    }
+
+    function isValidProfile(data) {
+      return data.keys().hasAll(['name', 'bloodType', 'emergencyContacts']) &&
+             data.name is string && data.name.size() > 0 && data.name.size() < 100 &&
+             data.bloodType is string && data.bloodType.size() > 0 && data.bloodType.size() < 5 &&
+             data.emergencyContacts is list && data.emergencyContacts.size() <= 3;
+    }
+
+    function isValidStatus(data) {
+      return data.battery is number && data.battery >= 0 && data.battery <= 100 &&
+             data.heartRate is number &&
+             data.spO2 is number &&
+             data.crashSensitivity in ['City Commute', 'Off-Road/Potholes'];
+    }
+
+    // ===============================================================
+    // Rules
+    // ===============================================================
+
+    match /users/{userId} {
+      allow read, write: if isOwner(userId) || isAdmin();
+
+      match /profile/{docId} {
+        allow read: if isOwner(userId) || isAdmin();
+        allow write: if isOwner(userId) && isValidProfile(request.resource.data);
+      }
+
+      match /status/{docId} {
+        allow read: if isOwner(userId) || isAdmin();
+        allow write: if isOwner(userId) && isValidStatus(request.resource.data);
+      }
+
+      match /crashes/{crashId} {
+        allow read: if isOwner(userId) || isAdmin();
+        allow create: if isOwner(userId);
+        allow update, delete: if isAdmin();
+      }
+
+      match /trips/{tripId} {
+        allow read: if isOwner(userId) || isAdmin();
+        allow create, update: if isOwner(userId);
+        allow delete: if isAdmin();
+      }
+
+      match /sensorData/{logId} {
+        allow read: if isOwner(userId) || isAdmin();
+        allow create: if isOwner(userId);
+        allow update, delete: if isAdmin();
+      }
+    }
+  }
+}
