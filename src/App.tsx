@@ -9,13 +9,18 @@ import {
   Activity, 
   Shield, 
   Map as MapIcon, 
+  Settings, 
+  Phone, 
   Ambulance, 
+  History, 
   User as UserIcon,
+  Navigation,
   CheckCircle,
   XCircle
 } from 'lucide-react';
 import { motion } from 'motion/react';
 import { cn } from './lib/utils';
+import { format } from 'date-fns';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
 
@@ -29,7 +34,6 @@ L.Icon.Default.mergeOptions({
 });
 
 // --- Types ---
-// Matches the FastAPI Backend Model
 interface ESP32Telemetry {
   helmetOn: boolean;
   sensor1: number;
@@ -44,6 +48,7 @@ interface ESP32Telemetry {
 }
 
 const BACKEND_URL = 'https://smart-helmet-backend-sqri.onrender.com';
+
 // --- Components ---
 
 const LoadingScreen = () => (
@@ -80,10 +85,7 @@ export default function App() {
       }
     };
 
-    // Initial fetch
     fetchLatestData();
-
-    // Setup polling
     const intervalId = setInterval(fetchLatestData, 2000);
     return () => clearInterval(intervalId);
   }, []);
@@ -106,7 +108,6 @@ export default function App() {
 
 function SOSTriageView({ telemetry }: { telemetry: ESP32Telemetry | null }) {
   const dismissAlert = async () => {
-    // Send a mock clear signal to the backend to reset the UI
     await fetch(`${BACKEND_URL}/telemetry`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -187,8 +188,6 @@ function SOSTriageView({ telemetry }: { telemetry: ESP32Telemetry | null }) {
 // --- Dashboard View ---
 
 function DashboardView({ telemetry }: { telemetry: ESP32Telemetry | null }) {
-  
-  // Test function to simulate hardware POST from the browser
   const simulateEspData = async () => {
     await fetch(`${BACKEND_URL}/telemetry`, {
       method: 'POST',
@@ -237,7 +236,6 @@ function DashboardView({ telemetry }: { telemetry: ESP32Telemetry | null }) {
       </header>
 
       <main className="px-6 py-8 space-y-12">
-        {/* Section 1: Live Telemetry */}
         <section className="space-y-6">
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-2">
@@ -310,7 +308,6 @@ function DashboardView({ telemetry }: { telemetry: ESP32Telemetry | null }) {
           </div>
         </section>
 
-        {/* Section 2: Last Known Location */}
         <section className="space-y-6">
           <div className="flex items-center gap-2 mb-2">
             <MapIcon className="w-5 h-5 text-blue-600" />
@@ -319,7 +316,7 @@ function DashboardView({ telemetry }: { telemetry: ESP32Telemetry | null }) {
           <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-200">
             <div className="aspect-[16/9] bg-slate-100 rounded-2xl overflow-hidden relative border border-slate-200">
               <MapContainer 
-                center={[15.3647, 75.1240]} // Default to Hubballi 
+                center={[15.3647, 75.1240]} 
                 zoom={13} 
                 className="h-full w-full z-0"
               >
