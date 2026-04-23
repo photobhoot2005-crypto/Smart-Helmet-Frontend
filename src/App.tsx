@@ -504,7 +504,7 @@ function DashboardView({ telemetry, onLogout }: { telemetry: ESP32Telemetry | nu
             <Shield className="text-white w-6 h-6" />
           </div>
           <div>
-            <h1 className="font-bold text-xl tracking-tight">SafeRide Helmet</h1>
+            <h1 className="font-bold text-xl tracking-tight">SURAKSHA SMART HELMET</h1>
             <p className="text-slate-500 text-xs font-medium uppercase tracking-wider">
               {telemetry ? 'Connected to ESP32' : 'Waiting for Hardware'}
             </p>
