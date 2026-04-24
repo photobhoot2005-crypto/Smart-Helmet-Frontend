@@ -346,17 +346,34 @@ function RiderProfileSettings({ profile, setProfile }: { profile: RiderProfile, 
 export default function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [telemetry, setTelemetry] = useState<ESP32Telemetry | null>(null);
-  const [isDarkMode, setIsDarkMode] = useState(false);
-
-  // LIFTED: Profile state is now here so both Dashboard and SOS Screen can use it!
-  const [profile, setProfile] = useState<RiderProfile>({
-    name: 'Chinmay Yalawatti',
-    bloodType: 'A-',
-    sensitivity: 80,
-    medicalConditions: 'None',
-    primary1: '+91 78997 95100',
-    primary2: '7353348918'
+  
+  // Dark mode loaded from LocalStorage
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    return localStorage.getItem('suraksha_theme') === 'dark';
   });
+
+  // Profile data loaded from LocalStorage
+  const [profile, setProfile] = useState<RiderProfile>(() => {
+    const saved = localStorage.getItem('suraksha_profile');
+    return saved ? JSON.parse(saved) : {
+      name: 'Chinmay Yalawatti',
+      bloodType: 'A-',
+      sensitivity: 80,
+      medicalConditions: 'None',
+      primary1: '+91 78997 95100',
+      primary2: '7353348918'
+    };
+  });
+
+  // Save profile to LocalStorage automatically whenever it changes
+  useEffect(() => {
+    localStorage.setItem('suraksha_profile', JSON.stringify(profile));
+  }, [profile]);
+
+  // Save dark mode preference automatically
+  useEffect(() => {
+    localStorage.setItem('suraksha_theme', isDarkMode ? 'dark' : 'light');
+  }, [isDarkMode]);
 
   const toggleDarkMode = () => {
     setIsDarkMode(!isDarkMode);
@@ -388,14 +405,14 @@ export default function App() {
   }
 
   if (telemetry?.alertInProgress || telemetry?.accidentConfirmed) {
-    return <SOSTriageView telemetry={telemetry} profile={profile} />; // Passes profile down
+    return <SOSTriageView telemetry={telemetry} profile={profile} />; 
   }
 
-  // Wrapper for Tailwind Dark Mode
   return (
     <div className={cn("min-h-screen font-sans transition-colors duration-300", isDarkMode ? "dark bg-[#0a0f1c] text-slate-100" : "bg-slate-50 text-slate-900")}>
       <DashboardView 
         telemetry={telemetry} 
+        setTelemetry={setTelemetry}
         onLogout={() => setIsAuthenticated(false)} 
         profile={profile} 
         setProfile={setProfile}
@@ -463,7 +480,6 @@ function SOSTriageView({ telemetry, profile }: { telemetry: ESP32Telemetry | nul
           <div className="space-y-4">
             <div>
               <p className="text-white/60 text-xs">Rider Name</p>
-              {/* DYNAMIC: Now uses the profile name saved in settings! */}
               <p className="text-white text-xl font-semibold">{profile.name}</p>
             </div>
             <div className="flex gap-4">
@@ -500,9 +516,10 @@ function SOSTriageView({ telemetry, profile }: { telemetry: ESP32Telemetry | nul
 
 // --- Dashboard View ---
 
-function DashboardView({ telemetry, onLogout, profile, setProfile, isDarkMode, toggleDarkMode }: { telemetry: ESP32Telemetry | null, onLogout: () => void, profile: RiderProfile, setProfile: React.Dispatch<React.SetStateAction<RiderProfile>>, isDarkMode: boolean, toggleDarkMode: () => void }) {
+function DashboardView({ telemetry, setTelemetry, onLogout, profile, setProfile, isDarkMode, toggleDarkMode }: { telemetry: ESP32Telemetry | null, setTelemetry: React.Dispatch<React.SetStateAction<ESP32Telemetry | null>>, onLogout: () => void, profile: RiderProfile, setProfile: React.Dispatch<React.SetStateAction<RiderProfile>>, isDarkMode: boolean, toggleDarkMode: () => void }) {
+  
   const simulateCrash = async () => {
-    // If helmet is connected, use its data. If not, create fake baseline data.
+    // Creating the fake crash data package
     const payload = telemetry ? {
       ...telemetry,
       ax: 35000,
@@ -519,11 +536,19 @@ function DashboardView({ telemetry, onLogout, profile, setProfile, isDarkMode, t
       accidentConfirmed: false
     };
 
-    await fetch(`${BACKEND_URL}/telemetry`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    });
+    // INSTANTLY update the local screen so you don't wait for the backend!
+    setTelemetry(payload);
+
+    // Send it to Render in the background anyway
+    try {
+      await fetch(`${BACKEND_URL}/telemetry`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+    } catch (e) {
+      console.log("Demo mode triggered offline");
+    }
   };
 
   return (
@@ -542,7 +567,6 @@ function DashboardView({ telemetry, onLogout, profile, setProfile, isDarkMode, t
           </div>
         </div>
         
-        {/* Dark Mode Toggle & Sign Out */}
         <div className="flex items-center gap-2">
           <button 
             onClick={toggleDarkMode}
