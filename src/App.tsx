@@ -502,15 +502,27 @@ function SOSTriageView({ telemetry, profile }: { telemetry: ESP32Telemetry | nul
 
 function DashboardView({ telemetry, onLogout, profile, setProfile, isDarkMode, toggleDarkMode }: { telemetry: ESP32Telemetry | null, onLogout: () => void, profile: RiderProfile, setProfile: React.Dispatch<React.SetStateAction<RiderProfile>>, isDarkMode: boolean, toggleDarkMode: () => void }) {
   const simulateCrash = async () => {
+    // If helmet is connected, use its data. If not, create fake baseline data.
+    const payload = telemetry ? {
+      ...telemetry,
+      ax: 35000,
+      alertInProgress: true,
+      accidentConfirmed: false
+    } : {
+      helmetOn: true,
+      sensor1: 0,
+      sensor2: 0,
+      ax: 35000,
+      ay: 0,
+      az: 9800,
+      alertInProgress: true,
+      accidentConfirmed: false
+    };
+
     await fetch(`${BACKEND_URL}/telemetry`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        ...telemetry,
-        ax: 35000,
-        alertInProgress: true,
-        accidentConfirmed: false
-      })
+      body: JSON.stringify(payload)
     });
   };
 
