@@ -195,8 +195,8 @@ function RiderProfileSettings({ profile, setProfile }: { profile: RiderProfile, 
     <section className="space-y-6 mt-8">
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
-          <Settings className="w-5 h-5 text-slate-700 dark:text-slate-300" />
-          <h2 className="text-xl font-bold text-slate-900 dark:text-white">System Settings</h2>
+          <Settings className="w-5 h-5 text-blue-600" />
+          <h2 className="text-xl font-bold">System Settings</h2>
         </div>
         <button 
           onClick={toggleEdit}
@@ -296,7 +296,7 @@ function RiderProfileSettings({ profile, setProfile }: { profile: RiderProfile, 
       <div className="mt-8">
         <div className="flex items-center gap-2 mb-4">
           <Phone className="w-5 h-5 text-red-500" />
-          <h2 className="text-xl font-bold text-slate-900 dark:text-white">Rescue Network</h2>
+          <h2 className="text-xl font-bold">Rescue Network</h2>
         </div>
         <div className="flex flex-wrap gap-4">
           <div className="bg-[#e2e6eb] dark:bg-slate-800/80 rounded-2xl p-4 flex items-center justify-between min-w-[180px] transition-colors">
@@ -592,7 +592,7 @@ function DashboardView({ telemetry, onLogout, profile, setProfile, isDarkMode, t
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-2">
               <Activity className="w-5 h-5 text-blue-600" />
-              <h2 className="text-lg font-bold text-slate-900 dark:text-white">Live Hardware Telemetry</h2>
+              <h2 className="text-lg font-bold">Live Hardware Telemetry</h2>
             </div>
             
             <a 
@@ -664,7 +664,7 @@ function DashboardView({ telemetry, onLogout, profile, setProfile, isDarkMode, t
         <section className="space-y-6">
           <div className="flex items-center gap-2 mb-2">
             <MapIcon className="w-5 h-5 text-blue-600" />
-            <h2 className="text-lg font-bold text-slate-900 dark:text-white">GPS Tracker (Coming Soon)</h2>
+            <h2 className="text-lg font-bold">GPS Tracker (Coming Soon)</h2>
           </div>
           <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-800 transition-colors">
             <div className="aspect-[16/9] bg-slate-100 dark:bg-slate-800 rounded-2xl overflow-hidden relative border border-slate-200 dark:border-slate-700">
