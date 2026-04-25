@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+
 import React, { useState, useEffect } from 'react';
 import { 
   AlertTriangle, 
@@ -29,6 +30,7 @@ import { format } from 'date-fns';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
 
+
 // Fix Leaflet icon issue
 // @ts-ignore
 delete L.Icon.Default.prototype._getIconUrl;
@@ -37,6 +39,7 @@ L.Icon.Default.mergeOptions({
   iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
   shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
 });
+
 
 // --- Types ---
 interface ESP32Telemetry {
@@ -54,6 +57,7 @@ interface ESP32Telemetry {
   lng?: number; // Added GPS Longitude
 }
 
+
 interface RiderProfile {
   name: string;
   bloodType: string;
@@ -63,7 +67,9 @@ interface RiderProfile {
   primary2: string;
 }
 
+
 const BACKEND_URL = 'https://smart-helmet-backend-sqri.onrender.com';
+
 
 // --- Auth View (Login Page) ---
 function AuthView({ onLogin }: { onLogin: () => void }) {
@@ -71,6 +77,7 @@ function AuthView({ onLogin }: { onLogin: () => void }) {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
+
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -81,12 +88,14 @@ function AuthView({ onLogin }: { onLogin: () => void }) {
     }
   };
 
+
   const handleGoogleLogin = () => {
     setIsGoogleLoading(true);
     setTimeout(() => {
       onLogin();
     }, 1500);
   };
+
 
   return (
     <div className="min-h-screen bg-[#0a0f1c] flex flex-col items-center justify-center p-6 font-sans">
@@ -100,6 +109,7 @@ function AuthView({ onLogin }: { onLogin: () => void }) {
           <span className="text-[10px] font-bold text-blue-400 tracking-widest uppercase">Next-Gen Protection</span>
         </div>
 
+
         <div className="w-24 h-24 bg-blue-600 rounded-[28px] flex items-center justify-center mb-8 shadow-[0_0_40px_rgba(37,99,235,0.3)]">
           <Shield className="text-white w-12 h-12" strokeWidth={1.5} />
         </div>
@@ -109,6 +119,7 @@ function AuthView({ onLogin }: { onLogin: () => void }) {
         <p className="text-slate-400 text-center mb-10 text-sm leading-relaxed px-4">
           Unified intelligence for the modern rider. Real-time telemetry, advanced crash detection, and smart analytics in one interface.
         </p>
+
 
         <form onSubmit={handleLogin} className="w-full space-y-4 mb-6">
           <div className="relative">
@@ -136,7 +147,9 @@ function AuthView({ onLogin }: { onLogin: () => void }) {
             />
           </div>
 
+
           {error && <p className="text-red-400 text-xs text-center font-medium">{error}</p>}
+
 
           <button 
             type="submit"
@@ -146,11 +159,13 @@ function AuthView({ onLogin }: { onLogin: () => void }) {
           </button>
         </form>
 
+
         <div className="w-full flex items-center justify-center gap-4 mb-6">
           <div className="h-px bg-slate-800 flex-1"></div>
           <span className="text-slate-600 text-xs font-medium uppercase">OR</span>
           <div className="h-px bg-slate-800 flex-1"></div>
         </div>
+
 
         <button
           type="button"
@@ -180,18 +195,22 @@ function AuthView({ onLogin }: { onLogin: () => void }) {
   );
 }
 
+
 // --- Rider Profile Settings Component ---
 function RiderProfileSettings({ profile, setProfile }: { profile: RiderProfile, setProfile: React.Dispatch<React.SetStateAction<RiderProfile>> }) {
   const [isEditing, setIsEditing] = useState(false);
+
 
   const toggleEdit = () => {
     setIsEditing(!isEditing);
   };
 
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setProfile(prev => ({ ...prev, [name]: value }));
   };
+
 
   return (
     <section className="space-y-6 mt-8">
@@ -208,6 +227,7 @@ function RiderProfileSettings({ profile, setProfile }: { profile: RiderProfile, 
           {isEditing ? 'Save Mission Profile' : 'Update Mission Profile'}
         </button>
       </div>
+
 
       <div className="bg-[#e2e6eb] dark:bg-slate-800/80 p-8 rounded-[32px] space-y-8 transition-colors">
         
@@ -250,6 +270,7 @@ function RiderProfileSettings({ profile, setProfile }: { profile: RiderProfile, 
             </div>
           </div>
 
+
           <div className="mt-4 space-y-1">
             <label className="text-slate-500 dark:text-slate-400 text-[10px] font-bold uppercase tracking-widest pl-1">Medical Conditions & Allergies</label>
             {isEditing ? (
@@ -262,6 +283,7 @@ function RiderProfileSettings({ profile, setProfile }: { profile: RiderProfile, 
             )}
           </div>
         </div>
+
 
         {/* EMERGENCY CHAIN */}
         <div>
@@ -292,7 +314,9 @@ function RiderProfileSettings({ profile, setProfile }: { profile: RiderProfile, 
           </div>
         </div>
 
+
       </div>
+
 
       {/* RESCUE NETWORK */}
       <div className="mt-8">
@@ -343,7 +367,9 @@ function RiderProfileSettings({ profile, setProfile }: { profile: RiderProfile, 
   );
 }
 
+
 // --- Main App ---
+
 
 export default function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -353,6 +379,7 @@ export default function App() {
   const [isDarkMode, setIsDarkMode] = useState(() => {
     return localStorage.getItem('suraksha_theme') === 'dark';
   });
+
 
   // Profile data loaded from LocalStorage
   const [profile, setProfile] = useState<RiderProfile>(() => {
@@ -367,19 +394,23 @@ export default function App() {
     };
   });
 
+
   // Save profile to LocalStorage automatically whenever it changes
   useEffect(() => {
     localStorage.setItem('suraksha_profile', JSON.stringify(profile));
   }, [profile]);
+
 
   // Save dark mode preference automatically
   useEffect(() => {
     localStorage.setItem('suraksha_theme', isDarkMode ? 'dark' : 'light');
   }, [isDarkMode]);
 
+
   const toggleDarkMode = () => {
     setIsDarkMode(!isDarkMode);
   };
+
 
   // --- CHANGED: Now fetches telemetry regardless of auth state ---
   useEffect(() => {
@@ -396,20 +427,24 @@ export default function App() {
       }
     };
 
+
     fetchLatestData();
     const intervalId = setInterval(fetchLatestData, 2000);
     return () => clearInterval(intervalId);
   }, []); // Removed isAuthenticated dependency
+
 
   // --- CHANGED: Crash state overrides everything, even the login screen! ---
   if (telemetry?.alertInProgress || telemetry?.accidentConfirmed) {
     return <SOSTriageView telemetry={telemetry} profile={profile} />; 
   }
 
+
   // Normal monitoring state requires login
   if (!isAuthenticated) {
     return <AuthView onLogin={() => setIsAuthenticated(true)} />;
   }
+
 
   return (
     <div className={cn("min-h-screen font-sans transition-colors duration-300", isDarkMode ? "dark bg-[#0a0f1c] text-slate-100" : "bg-slate-50 text-slate-900")}>
@@ -425,7 +460,9 @@ export default function App() {
   );
 }
 
+
 // --- SOS Triage View ---
+
 
 function SOSTriageView({ telemetry, profile }: { telemetry: ESP32Telemetry | null, profile: RiderProfile }) {
   const dismissAlert = async () => {
@@ -440,6 +477,7 @@ function SOSTriageView({ telemetry, profile }: { telemetry: ESP32Telemetry | nul
     });
   };
 
+
   return (
     <motion.div 
       initial={{ opacity: 0 }}
@@ -453,6 +491,7 @@ function SOSTriageView({ telemetry, profile }: { telemetry: ESP32Telemetry | nul
       >
         {telemetry?.accidentConfirmed ? "CRASH CONFIRMED: DO NOT REMOVE HELMET" : "IMPACT DETECTED: AWAITING RIDER CANCEL..."}
       </motion.div>
+
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto w-full">
         <div className="bg-red-700/50 backdrop-blur-md rounded-2xl p-6 border border-white/20">
@@ -474,6 +513,7 @@ function SOSTriageView({ telemetry, profile }: { telemetry: ESP32Telemetry | nul
             </div>
           </div>
         </div>
+
 
         <div className="bg-red-700/50 backdrop-blur-md rounded-2xl p-6 border border-white/20">
           <h2 className="text-white/70 uppercase text-xs font-bold tracking-widest mb-4 flex items-center gap-2">
@@ -498,6 +538,7 @@ function SOSTriageView({ telemetry, profile }: { telemetry: ESP32Telemetry | nul
         </div>
       </div>
 
+
       <div className="mt-auto pt-12 space-y-4 max-w-md mx-auto w-full">
         <button 
           onClick={() => window.location.href = `tel:${profile.primary1}`}
@@ -505,18 +546,14 @@ function SOSTriageView({ telemetry, profile }: { telemetry: ESP32Telemetry | nul
         >
           <Ambulance className="w-8 h-8" /> Alert Primary Contact
         </button>
-        <button 
-          onClick={dismissAlert}
-          className="w-full text-white/50 text-sm font-bold py-4 hover:text-white transition-colors"
-        >
-          I'm Safe - Dismiss Alert (Test)
-        </button>
       </div>
     </motion.div>
   );
 }
 
+
 // --- Dashboard View ---
+
 
 function DashboardView({ telemetry, onLogout, profile, setProfile, isDarkMode, toggleDarkMode }: { telemetry: ESP32Telemetry | null, onLogout: () => void, profile: RiderProfile, setProfile: React.Dispatch<React.SetStateAction<RiderProfile>>, isDarkMode: boolean, toggleDarkMode: () => void }) {
   
@@ -527,6 +564,7 @@ function DashboardView({ telemetry, onLogout, profile, setProfile, isDarkMode, t
     : `https://www.google.com/maps`; 
     
   const mapCenter: [number, number] = hasValidGPS ? [telemetry.lat!, telemetry.lng!] : [15.3647, 75.1240];
+
 
   return (
     <div className="max-w-5xl mx-auto pb-24">
@@ -561,6 +599,7 @@ function DashboardView({ telemetry, onLogout, profile, setProfile, isDarkMode, t
           </button>
         </div>
       </header>
+
 
       <main className="px-6 py-8 space-y-12">
         
@@ -601,6 +640,7 @@ function DashboardView({ telemetry, onLogout, profile, setProfile, isDarkMode, t
           </div>
         </section>
 
+
         <section className="space-y-6">
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-2">
@@ -636,6 +676,7 @@ function DashboardView({ telemetry, onLogout, profile, setProfile, isDarkMode, t
                 </p>
               </div>
 
+
               <div className="space-y-1">
                 <div className="flex items-center gap-1.5 text-slate-400">
                   {telemetry?.sensor1 === 0 ? <CheckCircle className="w-3.5 h-3.5 text-green-500"/> : <XCircle className="w-3.5 h-3.5 text-red-500"/>}
@@ -644,6 +685,7 @@ function DashboardView({ telemetry, onLogout, profile, setProfile, isDarkMode, t
                 <p className="text-xl font-black text-slate-900 dark:text-white">{telemetry?.sensor1 === 0 ? 'Clear' : 'Blocked'}</p>
               </div>
 
+
               <div className="space-y-1">
                 <div className="flex items-center gap-1.5 text-slate-400">
                   {telemetry?.sensor2 === 0 ? <CheckCircle className="w-3.5 h-3.5 text-green-500"/> : <XCircle className="w-3.5 h-3.5 text-red-500"/>}
@@ -651,6 +693,7 @@ function DashboardView({ telemetry, onLogout, profile, setProfile, isDarkMode, t
                 </div>
                 <p className="text-xl font-black text-slate-900 dark:text-white">{telemetry?.sensor2 === 0 ? 'Clear' : 'Blocked'}</p>
               </div>
+
 
               <div className="space-y-1">
                 <div className="flex items-center gap-1.5 text-slate-400">
@@ -664,6 +707,7 @@ function DashboardView({ telemetry, onLogout, profile, setProfile, isDarkMode, t
             </div>
           </div>
         </section>
+
 
         <section className="space-y-6">
           <div className="flex items-center justify-between mb-2">
@@ -681,6 +725,7 @@ function DashboardView({ telemetry, onLogout, profile, setProfile, isDarkMode, t
               <Navigation className="w-4 h-4" /> Open in Google Maps
             </a>
           </div>
+
 
           <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-800 transition-colors">
             <div className="aspect-[16/9] bg-slate-100 dark:bg-slate-800 rounded-2xl overflow-hidden relative border border-slate-200 dark:border-slate-700">
@@ -702,7 +747,9 @@ function DashboardView({ telemetry, onLogout, profile, setProfile, isDarkMode, t
           </div>
         </section>
 
+
         <RiderProfileSettings profile={profile} setProfile={setProfile} />
+
 
       </main>
     </div>
