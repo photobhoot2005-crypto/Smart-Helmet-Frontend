@@ -722,7 +722,7 @@ function DashboardView({ telemetry, setTelemetry, onLogout, profile, setProfile,
               href={googleMapsUrl} 
               target="_blank" 
               rel="noopener noreferrer"
-              className="bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 px-4 py-2 rounded-lg text-sm font-bold hover:bg-blue-200 dark:hover:bg-blue-900/50 flex items-center gap-2 transition-transform active:scale-95 shadow-sm"
+              className="bg-blue-600 text-white dark:bg-blue-600 dark:text-white px-5 py-2.5 rounded-lg text-sm font-bold hover:bg-blue-700 dark:hover:bg-blue-700 flex items-center gap-2 transition-all active:scale-95 shadow-md"
             >
               <Navigation className="w-4 h-4" /> Open in Google Maps
             </a>
