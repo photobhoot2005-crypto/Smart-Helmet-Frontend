@@ -381,9 +381,8 @@ export default function App() {
     setIsDarkMode(!isDarkMode);
   };
 
+  // --- CHANGED: Now fetches telemetry regardless of auth state ---
   useEffect(() => {
-    if (!isAuthenticated) return;
-
     const fetchLatestData = async () => {
       try {
         const response = await fetch(`${BACKEND_URL}/latest`);
@@ -400,21 +399,22 @@ export default function App() {
     fetchLatestData();
     const intervalId = setInterval(fetchLatestData, 2000);
     return () => clearInterval(intervalId);
-  }, [isAuthenticated]);
+  }, []); // Removed isAuthenticated dependency
 
-  if (!isAuthenticated) {
-    return <AuthView onLogin={() => setIsAuthenticated(true)} />;
-  }
-
+  // --- CHANGED: Crash state overrides everything, even the login screen! ---
   if (telemetry?.alertInProgress || telemetry?.accidentConfirmed) {
     return <SOSTriageView telemetry={telemetry} profile={profile} />; 
+  }
+
+  // Normal monitoring state requires login
+  if (!isAuthenticated) {
+    return <AuthView onLogin={() => setIsAuthenticated(true)} />;
   }
 
   return (
     <div className={cn("min-h-screen font-sans transition-colors duration-300", isDarkMode ? "dark bg-[#0a0f1c] text-slate-100" : "bg-slate-50 text-slate-900")}>
       <DashboardView 
         telemetry={telemetry} 
-        setTelemetry={setTelemetry}
         onLogout={() => setIsAuthenticated(false)} 
         profile={profile} 
         setProfile={setProfile}
@@ -518,51 +518,15 @@ function SOSTriageView({ telemetry, profile }: { telemetry: ESP32Telemetry | nul
 
 // --- Dashboard View ---
 
-function DashboardView({ telemetry, setTelemetry, onLogout, profile, setProfile, isDarkMode, toggleDarkMode }: { telemetry: ESP32Telemetry | null, setTelemetry: React.Dispatch<React.SetStateAction<ESP32Telemetry | null>>, onLogout: () => void, profile: RiderProfile, setProfile: React.Dispatch<React.SetStateAction<RiderProfile>>, isDarkMode: boolean, toggleDarkMode: () => void }) {
+function DashboardView({ telemetry, onLogout, profile, setProfile, isDarkMode, toggleDarkMode }: { telemetry: ESP32Telemetry | null, onLogout: () => void, profile: RiderProfile, setProfile: React.Dispatch<React.SetStateAction<RiderProfile>>, isDarkMode: boolean, toggleDarkMode: () => void }) {
   
-  // Check if we have valid GPS telemetry data right now
   const hasValidGPS = telemetry?.lat && telemetry?.lng && telemetry.lat !== 0 && telemetry.lng !== 0;
   
-  // Decide what the Google Maps button should open
   const googleMapsUrl = hasValidGPS 
     ? `https://www.google.com/maps/search/?api=1&query=${telemetry.lat},${telemetry.lng}`
-    : `https://www.google.com/maps`; // Fallback to search if no GPS lock
+    : `https://www.google.com/maps`; 
     
-  // Decide where the visual map should center
   const mapCenter: [number, number] = hasValidGPS ? [telemetry.lat!, telemetry.lng!] : [15.3647, 75.1240];
-
-  const simulateCrash = async () => {
-    // Creating the fake crash data package
-    const payload = telemetry ? {
-      ...telemetry,
-      ax: 35000,
-      alertInProgress: true,
-      accidentConfirmed: false
-    } : {
-      helmetOn: true,
-      sensor1: 0,
-      sensor2: 0,
-      ax: 35000,
-      ay: 0,
-      az: 9800,
-      alertInProgress: true,
-      accidentConfirmed: false
-    };
-
-    // INSTANTLY update the local screen so you don't wait for the backend!
-    setTelemetry(payload);
-
-    // Send it to Render in the background anyway
-    try {
-      await fetch(`${BACKEND_URL}/telemetry`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
-    } catch (e) {
-      console.log("Demo mode triggered offline");
-    }
-  };
 
   return (
     <div className="max-w-5xl mx-auto pb-24">
@@ -698,8 +662,6 @@ function DashboardView({ telemetry, setTelemetry, onLogout, profile, setProfile,
                 <p className="text-sm font-black text-slate-900 dark:text-white">Z: {telemetry?.az || 0}</p>
               </div>
             </div>
-
-            
           </div>
         </section>
 
@@ -710,7 +672,6 @@ function DashboardView({ telemetry, setTelemetry, onLogout, profile, setProfile,
               <h2 className="text-lg font-bold">GPS Tracker (Coming Soon)</h2>
             </div>
             
-            {/* DYNAMIC GOOGLE MAPS LINK */}
             <a 
               href={googleMapsUrl} 
               target="_blank" 
