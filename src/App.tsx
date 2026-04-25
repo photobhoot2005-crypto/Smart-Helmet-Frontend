@@ -699,14 +699,7 @@ function DashboardView({ telemetry, setTelemetry, onLogout, profile, setProfile,
               </div>
             </div>
 
-            <div className="mt-6 pt-6 border-t border-slate-100 dark:border-slate-800 flex justify-end">
-              <button 
-                onClick={simulateCrash}
-                className="text-red-500 text-xs font-bold uppercase tracking-widest flex items-center gap-2 hover:bg-red-50 dark:hover:bg-red-900/20 px-3 py-1.5 rounded-lg transition-colors"
-              >
-                <AlertTriangle className="w-3 h-3" /> Simulate Impact Event
-              </button>
-            </div>
+            
           </div>
         </section>
 
