@@ -50,6 +50,8 @@ interface ESP32Telemetry {
   accidentConfirmed: boolean;
   timestamp?: string;
   status?: string;
+  lat?: number; // Added GPS Latitude
+  lng?: number; // Added GPS Longitude
 }
 
 interface RiderProfile {
@@ -518,6 +520,17 @@ function SOSTriageView({ telemetry, profile }: { telemetry: ESP32Telemetry | nul
 
 function DashboardView({ telemetry, setTelemetry, onLogout, profile, setProfile, isDarkMode, toggleDarkMode }: { telemetry: ESP32Telemetry | null, setTelemetry: React.Dispatch<React.SetStateAction<ESP32Telemetry | null>>, onLogout: () => void, profile: RiderProfile, setProfile: React.Dispatch<React.SetStateAction<RiderProfile>>, isDarkMode: boolean, toggleDarkMode: () => void }) {
   
+  // Check if we have valid GPS telemetry data right now
+  const hasValidGPS = telemetry?.lat && telemetry?.lng && telemetry.lat !== 0 && telemetry.lng !== 0;
+  
+  // Decide what the Google Maps button should open
+  const googleMapsUrl = hasValidGPS 
+    ? `https://www.google.com/maps/search/?api=1&query=${telemetry.lat},${telemetry.lng}`
+    : `https://www.google.com/maps`; // Fallback to search if no GPS lock
+    
+  // Decide where the visual map should center
+  const mapCenter: [number, number] = hasValidGPS ? [telemetry.lat!, telemetry.lng!] : [15.3647, 75.1240];
+
   const simulateCrash = async () => {
     // Creating the fake crash data package
     const payload = telemetry ? {
@@ -615,10 +628,10 @@ function DashboardView({ telemetry, setTelemetry, onLogout, profile, setProfile,
               </div>
             </div>
             <div className="flex items-center gap-3 bg-slate-800 px-4 py-3 rounded-2xl">
-              <div className={cn("w-3 h-3 rounded-full", "bg-yellow-500 shadow-[0_0_10px_rgba(234,179,8,0.5)]")} />
+              <div className={cn("w-3 h-3 rounded-full", hasValidGPS ? "bg-green-500 shadow-[0_0_10px_rgba(34,197,94,0.5)]" : "bg-yellow-500 shadow-[0_0_10px_rgba(234,179,8,0.5)]")} />
               <div>
                 <p className="text-[10px] font-bold text-slate-400 uppercase">NEO-6M (GPS)</p>
-                <p className="text-sm font-black">PENDING</p>
+                <p className="text-sm font-black">{hasValidGPS ? 'LOCK ACQUIRED' : 'PENDING'}</p>
               </div>
             </div>
           </div>
@@ -698,23 +711,37 @@ function DashboardView({ telemetry, setTelemetry, onLogout, profile, setProfile,
         </section>
 
         <section className="space-y-6">
-          <div className="flex items-center gap-2 mb-2">
-            <MapIcon className="w-5 h-5 text-blue-600" />
-            <h2 className="text-lg font-bold">GPS Tracker (Coming Soon)</h2>
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-2">
+              <MapIcon className="w-5 h-5 text-blue-600" />
+              <h2 className="text-lg font-bold">GPS Tracker (Coming Soon)</h2>
+            </div>
+            
+            {/* DYNAMIC GOOGLE MAPS LINK */}
+            <a 
+              href={googleMapsUrl} 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 px-4 py-2 rounded-lg text-sm font-bold hover:bg-blue-200 dark:hover:bg-blue-900/50 flex items-center gap-2 transition-transform active:scale-95 shadow-sm"
+            >
+              <Navigation className="w-4 h-4" /> Open in Google Maps
+            </a>
           </div>
+
           <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-800 transition-colors">
             <div className="aspect-[16/9] bg-slate-100 dark:bg-slate-800 rounded-2xl overflow-hidden relative border border-slate-200 dark:border-slate-700">
               <MapContainer 
-                center={[15.3647, 75.1240]} 
+                key={`${mapCenter[0]}-${mapCenter[1]}`} 
+                center={mapCenter} 
                 zoom={13} 
                 className="h-full w-full z-0"
               >
                 <TileLayer
                   url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                  attribution='&copy; OpenStreetMap contributors'
+                  attribution='© OpenStreetMap contributors'
                 />
-                <Marker position={[15.3647, 75.1240]}>
-                  <Popup>Pending ESP32 GPS Integration</Popup>
+                <Marker position={mapCenter}>
+                  <Popup>{hasValidGPS ? "Live Rider Location" : "Pending ESP32 GPS Integration"}</Popup>
                 </Marker>
               </MapContainer>
             </div>
