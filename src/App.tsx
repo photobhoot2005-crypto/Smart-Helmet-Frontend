@@ -4,15 +4,15 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { 
-  AlertTriangle, 
-  Activity, 
-  Shield, 
-  Map as MapIcon, 
-  Settings, 
-  Phone, 
-  Ambulance, 
-  History, 
+import {
+  AlertTriangle,
+  Activity,
+  Shield,
+  Map as MapIcon,
+  Settings,
+  Phone,
+  Ambulance,
+  History,
   User as UserIcon,
   Navigation,
   CheckCircle,
@@ -26,8 +26,9 @@ import {
 import { motion } from 'motion/react';
 import { cn } from './lib/utils';
 import { format } from 'date-fns';
-import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet'; // ✅ Added useMap
+import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
+
 
 // Fix Leaflet icon issue
 // @ts-ignore
@@ -38,7 +39,7 @@ L.Icon.Default.mergeOptions({
   shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
 });
 
-// ✅ Added: Dynamically re-centers map when GPS coords update without remounting
+
 function MapUpdater({ center }: { center: [number, number] }) {
   const map = useMap();
   useEffect(() => {
@@ -47,11 +48,12 @@ function MapUpdater({ center }: { center: [number, number] }) {
   return null;
 }
 
+
 // --- Types ---
 interface ESP32Telemetry {
-  helmetOn: boolean;
-  sensor1: number;
-  sensor2: number;
+  helmetOn?: boolean;
+  sensor1?: number;
+  sensor2?: number;
   ax: number;
   ay: number;
   az: number;
@@ -63,6 +65,7 @@ interface ESP32Telemetry {
   lng?: number;
 }
 
+
 interface RiderProfile {
   name: string;
   bloodType: string;
@@ -72,9 +75,11 @@ interface RiderProfile {
   primary2: string;
 }
 
+
 const BACKEND_URL = 'https://smart-helmet-backend-sqri.onrender.com';
 
-// --- Auth View (Login Page) ---
+
+// --- Auth View ---
 function AuthView({ onLogin }: { onLogin: () => void }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -99,7 +104,7 @@ function AuthView({ onLogin }: { onLogin: () => void }) {
 
   return (
     <div className="min-h-screen bg-[#0a0f1c] flex flex-col items-center justify-center p-6 font-sans">
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         className="w-full max-w-md flex flex-col items-center"
@@ -112,9 +117,9 @@ function AuthView({ onLogin }: { onLogin: () => void }) {
         <div className="w-24 h-24 bg-blue-600 rounded-[28px] flex items-center justify-center mb-8 shadow-[0_0_40px_rgba(37,99,235,0.3)]">
           <Shield className="text-white w-12 h-12" strokeWidth={1.5} />
         </div>
-        
+
         <h1 className="text-5xl font-black text-white mb-6 tracking-tight">SURAKSHA</h1>
-        
+
         <p className="text-slate-400 text-center mb-10 text-sm leading-relaxed px-4">
           Unified intelligence for the modern rider. Real-time telemetry, advanced crash detection, and smart analytics in one interface.
         </p>
@@ -147,7 +152,7 @@ function AuthView({ onLogin }: { onLogin: () => void }) {
 
           {error && <p className="text-red-400 text-xs text-center font-medium">{error}</p>}
 
-          <button 
+          <button
             type="submit"
             className="w-full bg-blue-600 text-white font-bold py-4 rounded-2xl hover:bg-blue-700 transition-all active:scale-[0.98] shadow-lg shadow-blue-600/20"
           >
@@ -189,13 +194,12 @@ function AuthView({ onLogin }: { onLogin: () => void }) {
   );
 }
 
-// --- Rider Profile Settings Component ---
+
+// --- Rider Profile Settings ---
 function RiderProfileSettings({ profile, setProfile }: { profile: RiderProfile, setProfile: React.Dispatch<React.SetStateAction<RiderProfile>> }) {
   const [isEditing, setIsEditing] = useState(false);
 
-  const toggleEdit = () => {
-    setIsEditing(!isEditing);
-  };
+  const toggleEdit = () => setIsEditing(!isEditing);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -209,7 +213,7 @@ function RiderProfileSettings({ profile, setProfile }: { profile: RiderProfile, 
           <Settings className="w-5 h-5 text-blue-600" />
           <h2 className="text-xl font-bold">System Settings</h2>
         </div>
-        <button 
+        <button
           onClick={toggleEdit}
           className="bg-[#1a56db] text-white px-6 py-2.5 rounded-full text-sm font-bold flex items-center gap-2 hover:bg-blue-700 transition-colors shadow-md active:scale-95"
         >
@@ -219,7 +223,7 @@ function RiderProfileSettings({ profile, setProfile }: { profile: RiderProfile, 
       </div>
 
       <div className="bg-[#e2e6eb] dark:bg-slate-800/80 p-8 rounded-[32px] space-y-8 transition-colors">
-        
+
         {/* RIDER IDENTIFICATION */}
         <div>
           <h3 className="text-slate-500 dark:text-slate-400 text-xs font-bold uppercase tracking-widest mb-4">Rider Identification</h3>
@@ -227,10 +231,8 @@ function RiderProfileSettings({ profile, setProfile }: { profile: RiderProfile, 
             <div className="md:col-span-6 space-y-1">
               <label className="text-slate-500 dark:text-slate-400 text-[10px] font-bold uppercase tracking-widest pl-1">Full Legal Name</label>
               {isEditing ? (
-                <input 
-                  type="text" name="name" value={profile.name} onChange={handleInputChange}
-                  className="w-full bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-2xl py-3 px-4 font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
+                <input type="text" name="name" value={profile.name} onChange={handleInputChange}
+                  className="w-full bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-2xl py-3 px-4 font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500" />
               ) : (
                 <div className="w-full bg-[#d6dbe2] dark:bg-slate-900/50 border border-transparent text-slate-900 dark:text-white rounded-2xl py-3 px-4 font-semibold">{profile.name}</div>
               )}
@@ -238,34 +240,27 @@ function RiderProfileSettings({ profile, setProfile }: { profile: RiderProfile, 
             <div className="md:col-span-3 space-y-1">
               <label className="text-slate-500 dark:text-slate-400 text-[10px] font-bold uppercase tracking-widest pl-1">Blood Type</label>
               {isEditing ? (
-                <input 
-                  type="text" name="bloodType" value={profile.bloodType} onChange={handleInputChange}
-                  className="w-full bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-2xl py-3 px-4 font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
+                <input type="text" name="bloodType" value={profile.bloodType} onChange={handleInputChange}
+                  className="w-full bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-2xl py-3 px-4 font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500" />
               ) : (
                 <div className="w-full bg-[#d6dbe2] dark:bg-slate-900/50 border border-transparent text-slate-900 dark:text-white rounded-2xl py-3 px-4 font-semibold">{profile.bloodType}</div>
               )}
             </div>
             <div className="md:col-span-3 space-y-1 flex flex-col justify-center pt-2">
-               <label className="text-slate-500 dark:text-slate-400 text-[10px] font-bold uppercase tracking-widest pl-1 mb-2">Sensitivity</label>
-               <input 
-                 type="range" name="sensitivity" 
-                 min="0" max="100" 
-                 disabled={!isEditing}
-                 value={profile.sensitivity} 
-                 onChange={handleInputChange}
-                 className="w-full h-2 bg-slate-300 dark:bg-slate-700 rounded-lg appearance-none cursor-pointer accent-blue-600"
-               />
+              <label className="text-slate-500 dark:text-slate-400 text-[10px] font-bold uppercase tracking-widest pl-1 mb-2">Sensitivity</label>
+              <input type="range" name="sensitivity" min="0" max="100"
+                disabled={!isEditing}
+                value={profile.sensitivity}
+                onChange={handleInputChange}
+                className="w-full h-2 bg-slate-300 dark:bg-slate-700 rounded-lg appearance-none cursor-pointer accent-blue-600" />
             </div>
           </div>
 
           <div className="mt-4 space-y-1">
             <label className="text-slate-500 dark:text-slate-400 text-[10px] font-bold uppercase tracking-widest pl-1">Medical Conditions & Allergies</label>
             {isEditing ? (
-              <textarea 
-                name="medicalConditions" value={profile.medicalConditions} onChange={handleInputChange} rows={2}
-                className="w-full bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-2xl py-3 px-4 font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
-              />
+              <textarea name="medicalConditions" value={profile.medicalConditions} onChange={handleInputChange} rows={2}
+                className="w-full bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-2xl py-3 px-4 font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none" />
             ) : (
               <div className="w-full bg-[#d6dbe2] dark:bg-slate-900/50 border border-transparent text-slate-900 dark:text-white rounded-2xl py-3 px-4 font-semibold min-h-[60px]">{profile.medicalConditions}</div>
             )}
@@ -279,10 +274,8 @@ function RiderProfileSettings({ profile, setProfile }: { profile: RiderProfile, 
             <div className="space-y-1">
               <label className="text-slate-500 dark:text-slate-400 text-[10px] font-bold uppercase tracking-widest pl-1">Primary #1 (Main Contact)</label>
               {isEditing ? (
-                <input 
-                  type="text" name="primary1" value={profile.primary1} onChange={handleInputChange}
-                  className="w-full bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-2xl py-3 px-4 font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
+                <input type="text" name="primary1" value={profile.primary1} onChange={handleInputChange}
+                  className="w-full bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-2xl py-3 px-4 font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500" />
               ) : (
                 <div className="w-full bg-[#d6dbe2] dark:bg-slate-900/50 border border-transparent text-slate-900 dark:text-white rounded-2xl py-3 px-4 font-semibold">{profile.primary1}</div>
               )}
@@ -290,10 +283,8 @@ function RiderProfileSettings({ profile, setProfile }: { profile: RiderProfile, 
             <div className="space-y-1">
               <label className="text-slate-500 dark:text-slate-400 text-[10px] font-bold uppercase tracking-widest pl-1">Primary #2</label>
               {isEditing ? (
-                <input 
-                  type="text" name="primary2" value={profile.primary2} onChange={handleInputChange}
-                  className="w-full bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-2xl py-3 px-4 font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
+                <input type="text" name="primary2" value={profile.primary2} onChange={handleInputChange}
+                  className="w-full bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-2xl py-3 px-4 font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500" />
               ) : (
                 <div className="w-full bg-[#d6dbe2] dark:bg-slate-900/50 border border-transparent text-slate-900 dark:text-white rounded-2xl py-3 px-4 font-semibold">{profile.primary2}</div>
               )}
@@ -310,54 +301,34 @@ function RiderProfileSettings({ profile, setProfile }: { profile: RiderProfile, 
           <h2 className="text-xl font-bold">Rescue Network</h2>
         </div>
         <div className="flex flex-wrap gap-4">
-          <div className="bg-[#e2e6eb] dark:bg-slate-800/80 rounded-2xl p-4 flex items-center justify-between min-w-[180px] transition-colors">
-            <div>
-              <p className="text-slate-500 dark:text-slate-400 text-[10px] font-bold uppercase tracking-widest">Emergency</p>
-              <p className="text-2xl font-black text-slate-900 dark:text-white">112</p>
+          {[
+            { label: 'Emergency', number: '112' },
+            { label: 'Ambulance', number: '108' },
+            { label: 'Police', number: '100' },
+            { label: 'Roadside', number: '1800-456' },
+          ].map(({ label, number }) => (
+            <div key={label} className="bg-[#e2e6eb] dark:bg-slate-800/80 rounded-2xl p-4 flex items-center justify-between min-w-[180px] transition-colors">
+              <div>
+                <p className="text-slate-500 dark:text-slate-400 text-[10px] font-bold uppercase tracking-widest">{label}</p>
+                <p className="text-2xl font-black text-slate-900 dark:text-white">{number}</p>
+              </div>
+              <div className="w-10 h-10 border-2 border-slate-300 dark:border-slate-600 rounded-xl flex items-center justify-center">
+                <Phone className="w-4 h-4 text-slate-500 dark:text-slate-400" />
+              </div>
             </div>
-            <div className="w-10 h-10 border-2 border-slate-300 dark:border-slate-600 rounded-xl flex items-center justify-center">
-              <Phone className="w-4 h-4 text-slate-500 dark:text-slate-400" />
-            </div>
-          </div>
-          <div className="bg-[#e2e6eb] dark:bg-slate-800/80 rounded-2xl p-4 flex items-center justify-between min-w-[180px] transition-colors">
-            <div>
-              <p className="text-slate-500 dark:text-slate-400 text-[10px] font-bold uppercase tracking-widest">Ambulance</p>
-              <p className="text-2xl font-black text-slate-900 dark:text-white">108</p>
-            </div>
-            <div className="w-10 h-10 border-2 border-slate-300 dark:border-slate-600 rounded-xl flex items-center justify-center">
-              <Phone className="w-4 h-4 text-slate-500 dark:text-slate-400" />
-            </div>
-          </div>
-          <div className="bg-[#e2e6eb] dark:bg-slate-800/80 rounded-2xl p-4 flex items-center justify-between min-w-[180px] transition-colors">
-            <div>
-              <p className="text-slate-500 dark:text-slate-400 text-[10px] font-bold uppercase tracking-widest">Police</p>
-              <p className="text-2xl font-black text-slate-900 dark:text-white">100</p>
-            </div>
-            <div className="w-10 h-10 border-2 border-slate-300 dark:border-slate-600 rounded-xl flex items-center justify-center">
-              <Phone className="w-4 h-4 text-slate-500 dark:text-slate-400" />
-            </div>
-          </div>
-          <div className="bg-[#e2e6eb] dark:bg-slate-800/80 rounded-2xl p-4 flex items-center justify-between min-w-[180px] transition-colors">
-            <div>
-              <p className="text-slate-500 dark:text-slate-400 text-[10px] font-bold uppercase tracking-widest">Roadside</p>
-              <p className="text-2xl font-black text-slate-900 dark:text-white">1800-456</p>
-            </div>
-            <div className="w-10 h-10 border-2 border-slate-300 dark:border-slate-600 rounded-xl flex items-center justify-center">
-              <Phone className="w-4 h-4 text-slate-500 dark:text-slate-400" />
-            </div>
-          </div>
+          ))}
         </div>
       </div>
     </section>
   );
 }
 
-// --- Main App ---
 
+// --- Main App ---
 export default function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [telemetry, setTelemetry] = useState<ESP32Telemetry | null>(null);
-  
+
   const [isDarkMode, setIsDarkMode] = useState(() => {
     return localStorage.getItem('suraksha_theme') === 'dark';
   });
@@ -382,16 +353,13 @@ export default function App() {
     localStorage.setItem('suraksha_theme', isDarkMode ? 'dark' : 'light');
   }, [isDarkMode]);
 
-  const toggleDarkMode = () => {
-    setIsDarkMode(!isDarkMode);
-  };
+  const toggleDarkMode = () => setIsDarkMode(!isDarkMode);
 
   useEffect(() => {
     const fetchLatestData = async () => {
       try {
         const response = await fetch(`${BACKEND_URL}/latest`);
         const data = await response.json();
-        
         if (data.status !== 'waiting_for_esp32') {
           setTelemetry(data);
         }
@@ -405,8 +373,9 @@ export default function App() {
     return () => clearInterval(intervalId);
   }, []);
 
+  // ✅ Crash page shows regardless of login state — no auth gate on emergencies
   if (telemetry?.alertInProgress || telemetry?.accidentConfirmed) {
-    return <SOSTriageView telemetry={telemetry} profile={profile} />; 
+    return <SOSTriageView telemetry={telemetry} profile={profile} />;
   }
 
   if (!isAuthenticated) {
@@ -415,10 +384,10 @@ export default function App() {
 
   return (
     <div className={cn("min-h-screen font-sans transition-colors duration-300", isDarkMode ? "dark bg-[#0a0f1c] text-slate-100" : "bg-slate-50 text-slate-900")}>
-      <DashboardView 
-        telemetry={telemetry} 
-        onLogout={() => setIsAuthenticated(false)} 
-        profile={profile} 
+      <DashboardView
+        telemetry={telemetry}
+        onLogout={() => setIsAuthenticated(false)}
+        profile={profile}
         setProfile={setProfile}
         isDarkMode={isDarkMode}
         toggleDarkMode={toggleDarkMode}
@@ -427,8 +396,8 @@ export default function App() {
   );
 }
 
-// --- SOS Triage View ---
 
+// --- SOS Triage View ---
 function SOSTriageView({ telemetry, profile }: { telemetry: ESP32Telemetry | null, profile: RiderProfile }) {
   const dismissAlert = async () => {
     await fetch(`${BACKEND_URL}/telemetry`, {
@@ -443,17 +412,19 @@ function SOSTriageView({ telemetry, profile }: { telemetry: ESP32Telemetry | nul
   };
 
   return (
-    <motion.div 
+    <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       className="fixed inset-0 bg-red-600 z-[100] flex flex-col p-6 overflow-y-auto"
     >
-      <motion.div 
+      <motion.div
         animate={{ opacity: [1, 0.5, 1] }}
         transition={{ duration: 1, repeat: Infinity }}
         className="bg-white text-red-600 p-4 rounded-xl text-center font-bold text-xl mb-8 shadow-2xl"
       >
-        {telemetry?.accidentConfirmed ? "CRASH CONFIRMED: DO NOT REMOVE HELMET" : "IMPACT DETECTED: AWAITING RIDER CANCEL..."}
+        {telemetry?.accidentConfirmed
+          ? "CRASH CONFIRMED: DO NOT REMOVE HELMET"
+          : "IMPACT DETECTED: AWAITING RIDER CANCEL..."}
       </motion.div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto w-full">
@@ -462,18 +433,16 @@ function SOSTriageView({ telemetry, profile }: { telemetry: ESP32Telemetry | nul
             <Activity className="w-4 h-4" /> Live Impact Metrics
           </h2>
           <div className="grid grid-cols-3 gap-4">
-            <div className="bg-white/10 rounded-xl p-4">
-              <p className="text-white/60 text-xs mb-1">Accel X</p>
-              <p className="text-white text-xl font-bold">{telemetry?.ax || '--'}</p>
-            </div>
-            <div className="bg-white/10 rounded-xl p-4">
-              <p className="text-white/60 text-xs mb-1">Accel Y</p>
-              <p className="text-white text-xl font-bold">{telemetry?.ay || '--'}</p>
-            </div>
-            <div className="bg-white/10 rounded-xl p-4">
-              <p className="text-white/60 text-xs mb-1">Accel Z</p>
-              <p className="text-white text-xl font-bold">{telemetry?.az || '--'}</p>
-            </div>
+            {[
+              { label: 'Accel X', value: telemetry?.ax },
+              { label: 'Accel Y', value: telemetry?.ay },
+              { label: 'Accel Z', value: telemetry?.az },
+            ].map(({ label, value }) => (
+              <div key={label} className="bg-white/10 rounded-xl p-4">
+                <p className="text-white/60 text-xs mb-1">{label}</p>
+                <p className="text-white text-xl font-bold">{value ?? '--'}</p>
+              </div>
+            ))}
           </div>
         </div>
 
@@ -501,7 +470,7 @@ function SOSTriageView({ telemetry, profile }: { telemetry: ESP32Telemetry | nul
       </div>
 
       <div className="mt-auto pt-12 space-y-4 max-w-md mx-auto w-full">
-        <button 
+        <button
           onClick={() => window.location.href = `tel:${profile.primary1}`}
           className="w-full bg-red-950 text-white h-20 rounded-2xl font-bold text-xl flex items-center justify-center gap-4 shadow-2xl active:scale-95 transition-transform border border-white/10"
         >
@@ -512,17 +481,23 @@ function SOSTriageView({ telemetry, profile }: { telemetry: ESP32Telemetry | nul
   );
 }
 
-// --- Dashboard View ---
 
-function DashboardView({ telemetry, onLogout, profile, setProfile, isDarkMode, toggleDarkMode }: { telemetry: ESP32Telemetry | null, onLogout: () => void, profile: RiderProfile, setProfile: React.Dispatch<React.SetStateAction<RiderProfile>>, isDarkMode: boolean, toggleDarkMode: () => void }) {
-  
+// --- Dashboard View ---
+function DashboardView({ telemetry, onLogout, profile, setProfile, isDarkMode, toggleDarkMode }: {
+  telemetry: ESP32Telemetry | null,
+  onLogout: () => void,
+  profile: RiderProfile,
+  setProfile: React.Dispatch<React.SetStateAction<RiderProfile>>,
+  isDarkMode: boolean,
+  toggleDarkMode: () => void
+}) {
   const hasValidGPS = telemetry?.lat && telemetry?.lng && telemetry.lat !== 0 && telemetry.lng !== 0;
-  
-  const googleMapsUrl = hasValidGPS 
-    ? `https://www.google.com/maps/search/?api=1&query=${telemetry.lat},${telemetry.lng}`
-    : `https://www.google.com/maps`; 
-    
-  const mapCenter: [number, number] = hasValidGPS ? [telemetry.lat!, telemetry.lng!] : [15.3647, 75.1240];
+
+  const googleMapsUrl = hasValidGPS
+    ? `https://www.google.com/maps/search/?api=1&query=${telemetry!.lat},${telemetry!.lng}`
+    : `https://www.google.com/maps`;
+
+  const mapCenter: [number, number] = hasValidGPS ? [telemetry!.lat!, telemetry!.lng!] : [15.3647, 75.1240];
 
   return (
     <div className="max-w-5xl mx-auto pb-24">
@@ -539,9 +514,9 @@ function DashboardView({ telemetry, onLogout, profile, setProfile, isDarkMode, t
             </p>
           </div>
         </div>
-        
+
         <div className="flex items-center gap-2">
-          <button 
+          <button
             onClick={toggleDarkMode}
             className="p-2 rounded-full hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors"
             title="Toggle Theme"
@@ -549,7 +524,7 @@ function DashboardView({ telemetry, onLogout, profile, setProfile, isDarkMode, t
             {isDarkMode ? <Sun className="w-5 h-5 text-yellow-500" /> : <Moon className="w-5 h-5 text-slate-600" />}
           </button>
           <div className="w-px h-6 bg-slate-300 dark:bg-slate-700 mx-1"></div>
-          <button 
+          <button
             onClick={onLogout}
             className="text-sm font-bold text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors px-2"
           >
@@ -559,8 +534,8 @@ function DashboardView({ telemetry, onLogout, profile, setProfile, isDarkMode, t
       </header>
 
       <main className="px-6 py-8 space-y-12">
-        
-        {/* --- SYSTEM SENSOR DIAGNOSTICS --- */}
+
+        {/* SYSTEM DIAGNOSTICS — IR sensor cards removed, replaced with Buzzer & Buttons */}
         <section className="bg-slate-900 rounded-3xl p-6 text-white shadow-lg">
           <h2 className="text-sm font-bold uppercase tracking-widest text-slate-400 mb-4 flex items-center gap-2">
             <Cpu className="w-4 h-4" /> System Diagnostics
@@ -576,15 +551,15 @@ function DashboardView({ telemetry, onLogout, profile, setProfile, isDarkMode, t
             <div className="flex items-center gap-3 bg-slate-800 px-4 py-3 rounded-2xl">
               <div className={cn("w-3 h-3 rounded-full", telemetry ? "bg-green-500 shadow-[0_0_10px_rgba(34,197,94,0.5)]" : "bg-red-500")} />
               <div>
-                <p className="text-[10px] font-bold text-slate-400 uppercase">IR Sensor 1 (Left)</p>
-                <p className="text-sm font-black">{telemetry ? 'ONLINE' : 'OFFLINE'}</p>
+                <p className="text-[10px] font-bold text-slate-400 uppercase">ESP32 (Cloud)</p>
+                <p className="text-sm font-black">{telemetry ? 'CONNECTED' : 'OFFLINE'}</p>
               </div>
             </div>
             <div className="flex items-center gap-3 bg-slate-800 px-4 py-3 rounded-2xl">
               <div className={cn("w-3 h-3 rounded-full", telemetry ? "bg-green-500 shadow-[0_0_10px_rgba(34,197,94,0.5)]" : "bg-red-500")} />
               <div>
-                <p className="text-[10px] font-bold text-slate-400 uppercase">IR Sensor 2 (Right)</p>
-                <p className="text-sm font-black">{telemetry ? 'ONLINE' : 'OFFLINE'}</p>
+                <p className="text-[10px] font-bold text-slate-400 uppercase">Buzzer & Buttons</p>
+                <p className="text-sm font-black">{telemetry ? 'READY' : 'OFFLINE'}</p>
               </div>
             </div>
             <div className="flex items-center gap-3 bg-slate-800 px-4 py-3 rounded-2xl">
@@ -597,21 +572,21 @@ function DashboardView({ telemetry, onLogout, profile, setProfile, isDarkMode, t
           </div>
         </section>
 
+        {/* LIVE TELEMETRY */}
         <section className="space-y-6">
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-2">
               <Activity className="w-5 h-5 text-blue-600" />
               <h2 className="text-lg font-bold">Live Hardware Telemetry</h2>
             </div>
-            
-            <a 
+            <a
               href={`tel:${profile.primary1}`}
               className="bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 px-5 py-2.5 rounded-lg text-sm font-bold hover:bg-red-200 dark:hover:bg-red-900/50 flex items-center gap-2 transition-transform active:scale-95 shadow-sm"
             >
               <Phone className="w-4 h-4" /> Emergency Call
             </a>
           </div>
-          
+
           <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-800 transition-colors">
             <div className="flex items-center justify-between mb-6">
               <h3 className="font-bold text-slate-900 dark:text-white">ESP32 Sensor Feed</h3>
@@ -620,59 +595,54 @@ function DashboardView({ telemetry, onLogout, profile, setProfile, isDarkMode, t
                 {telemetry ? 'Receiving Data' : 'Offline'}
               </div>
             </div>
-            
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-6">
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              {/* ✅ Crash Status card — replaces removed IR sensor cards */}
               <div className="space-y-1">
                 <div className="flex items-center gap-1.5 text-slate-400">
-                  <Shield className="w-3.5 h-3.5" />
-                  <span className="text-[10px] font-bold uppercase tracking-wider">Helmet Status</span>
+                  <AlertTriangle className="w-3.5 h-3.5" />
+                  <span className="text-[10px] font-bold uppercase tracking-wider">Crash Status</span>
                 </div>
-                <p className={cn("text-xl font-black", telemetry?.helmetOn ? "text-green-600 dark:text-green-400" : "text-slate-400")}>
-                  {telemetry?.helmetOn ? 'WORN' : 'REMOVED'}
+                <p className={cn("text-xl font-black", telemetry?.accidentConfirmed
+                  ? "text-red-600 dark:text-red-400"
+                  : telemetry?.alertInProgress
+                    ? "text-yellow-500"
+                    : "text-green-600 dark:text-green-400"
+                )}>
+                  {telemetry?.accidentConfirmed
+                    ? '🚨 CRASH CONFIRMED'
+                    : telemetry?.alertInProgress
+                      ? '⚠️ IMPACT DETECTED'
+                      : '✅ NORMAL'}
                 </p>
               </div>
 
-              <div className="space-y-1">
-                <div className="flex items-center gap-1.5 text-slate-400">
-                  {telemetry?.sensor1 === 0 ? <CheckCircle className="w-3.5 h-3.5 text-green-500"/> : <XCircle className="w-3.5 h-3.5 text-red-500"/>}
-                  <span className="text-[10px] font-bold uppercase tracking-wider">IR Sensor 1</span>
-                </div>
-                <p className="text-xl font-black text-slate-900 dark:text-white">{telemetry?.sensor1 === 0 ? 'Clear' : 'Blocked'}</p>
-              </div>
-
-              <div className="space-y-1">
-                <div className="flex items-center gap-1.5 text-slate-400">
-                  {telemetry?.sensor2 === 0 ? <CheckCircle className="w-3.5 h-3.5 text-green-500"/> : <XCircle className="w-3.5 h-3.5 text-red-500"/>}
-                  <span className="text-[10px] font-bold uppercase tracking-wider">IR Sensor 2</span>
-                </div>
-                <p className="text-xl font-black text-slate-900 dark:text-white">{telemetry?.sensor2 === 0 ? 'Clear' : 'Blocked'}</p>
-              </div>
-
+              {/* MPU6050 Accel */}
               <div className="space-y-1">
                 <div className="flex items-center gap-1.5 text-slate-400">
                   <Activity className="w-3.5 h-3.5" />
                   <span className="text-[10px] font-bold uppercase tracking-wider">MPU6050 Accel</span>
                 </div>
-                <p className="text-sm font-black text-slate-900 dark:text-white">X: {telemetry?.ax || 0}</p>
-                <p className="text-sm font-black text-slate-900 dark:text-white">Y: {telemetry?.ay || 0}</p>
-                <p className="text-sm font-black text-slate-900 dark:text-white">Z: {telemetry?.az || 0}</p>
+                <p className="text-sm font-black text-slate-900 dark:text-white">X: {telemetry?.ax ?? 0}</p>
+                <p className="text-sm font-black text-slate-900 dark:text-white">Y: {telemetry?.ay ?? 0}</p>
+                <p className="text-sm font-black text-slate-900 dark:text-white">Z: {telemetry?.az ?? 0}</p>
               </div>
             </div>
           </div>
         </section>
 
+        {/* GPS MAP */}
         <section className="space-y-6">
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-2">
               <MapIcon className="w-5 h-5 text-blue-600" />
-              <h2 className="text-lg font-bold">GPS Tracker (Live)</h2> {/* ✅ Updated label */}
+              <h2 className="text-lg font-bold">GPS Tracker (Live)</h2>
             </div>
-            
-            <a 
-              href={googleMapsUrl} 
-              target="_blank" 
+            <a
+              href={googleMapsUrl}
+              target="_blank"
               rel="noopener noreferrer"
-              className="bg-blue-600 text-white dark:bg-blue-600 dark:text-white px-5 py-2.5 rounded-lg text-sm font-bold hover:bg-blue-700 dark:hover:bg-blue-700 flex items-center gap-2 transition-all active:scale-95 shadow-md"
+              className="bg-blue-600 text-white px-5 py-2.5 rounded-lg text-sm font-bold hover:bg-blue-700 flex items-center gap-2 transition-all active:scale-95 shadow-md"
             >
               <Navigation className="w-4 h-4" /> Open in Google Maps
             </a>
@@ -680,21 +650,20 @@ function DashboardView({ telemetry, onLogout, profile, setProfile, isDarkMode, t
 
           <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-800 transition-colors">
             <div className="aspect-[16/9] bg-slate-100 dark:bg-slate-800 rounded-2xl overflow-hidden relative border border-slate-200 dark:border-slate-700">
-              <MapContainer 
+              <MapContainer
                 center={mapCenter}
-                zoom={13} 
+                zoom={13}
                 className="h-full w-full z-0"
               >
                 <TileLayer
                   url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                   attribution='© OpenStreetMap contributors'
                 />
-                {/* ✅ Added: Dynamically pans map to live GPS coords without remounting */}
                 <MapUpdater center={mapCenter} />
                 <Marker position={mapCenter}>
                   <Popup>
-                    {hasValidGPS 
-                      ? `📍 ${telemetry?.lat?.toFixed(5)}, ${telemetry?.lng?.toFixed(5)}` 
+                    {hasValidGPS
+                      ? `📍 ${telemetry?.lat?.toFixed(5)}, ${telemetry?.lng?.toFixed(5)}`
                       : "Pending GPS Lock"}
                   </Popup>
                 </Marker>
@@ -708,4 +677,4 @@ function DashboardView({ telemetry, onLogout, profile, setProfile, isDarkMode, t
       </main>
     </div>
   );
-}
+}      
